@@ -24,6 +24,12 @@ The model classifies images into 15 selected CIFAR-100 classes:
 - caterpillar
 - cockroach
 
+## Live Demo
+
+Try the deployed Flask app here:
+
+[Nature Classification CNN](https://nature-classification-cnn.onrender.com/)
+
 ## Features
 
 - CNN model built with PyTorch
@@ -98,8 +104,8 @@ This result is reasonable for a simple CNN trained on a subset of CIFAR-100. The
 Clone the repository:
 
 ```bash
-git https://github.com/swayamkr03/Nature_classification_CNN.git
-cd nature-classification
+git clone https://github.com/swayamkr03/Nature_classification_CNN.git
+cd Nature_classification_CNN
 ```
 
 Install dependencies:
