@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nature CNN Classifier</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="bg-vein" aria-hidden="true">
+        <svg viewBox="0 0 800 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+            <path d="M400 50 C 400 300 200 400 100 700" stroke="#4a7c59" stroke-width="1.2" fill="none" opacity="0.18"/>
+            <path d="M400 50 C 420 180 520 250 620 400 C 680 480 650 620 580 750" stroke="#4a7c59" stroke-width="0.9" fill="none" opacity="0.12"/>
+            <path d="M400 50 C 380 200 300 280 240 420 C 190 530 220 660 280 780" stroke="#8fbc5a" stroke-width="0.7" fill="none" opacity="0.1"/>
+            <path d="M400 50 C 440 170 560 220 660 350 C 720 440 700 580 640 700" stroke="#4a7c59" stroke-width="0.6" fill="none" opacity="0.09"/>
+            <path d="M400 50 C 360 200 260 300 180 460 C 130 560 150 690 200 800" stroke="#8fbc5a" stroke-width="0.5" fill="none" opacity="0.08"/>
+        </svg>
+    </div>
+
+    <main class="page">
+        <section class="panel">
+
+            <header class="panel-header">
+                <div class="header-eyebrow">Field Classification System</div>
+                <h1>Nature<br><em>Identifier</em></h1>
+                <p class="header-sub">Upload a specimen photograph to classify flora, fauna, and natural formations using a convolutional neural network.</p>
+            </header>
+
+            <form method="POST" enctype="multipart/form-data" class="upload-form" id="uploadForm">
+                <label class="drop-zone" id="dropZone" for="fileInput">
+                    <div class="drop-zone-inner">
+                        <svg class="drop-icon" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M6 32 C6 38 10 42 16 42 L32 42 C38 42 42 38 42 32" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M24 6 L24 30 M16 14 L24 6 L32 14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span class="drop-label" id="dropLabel">Drop image here or <u>browse</u></span>
+                        <span class="drop-hint">JPG, PNG, WEBP accepted</span>
+                    </div>
+                    <input type="file" name="image" id="fileInput" accept="image/*" required>
+                </label>
+
+                <button type="submit" class="submit-btn">
+                    <span>Classify Specimen</span>
+                    <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 10 H16 M11 5 L16 10 L11 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+            </form>
+
+            {% if image_path %}
+            <div class="result" id="result">
+                <div class="result-image-wrap">
+                    <img src="{{ image_path }}" alt="Uploaded specimen">
+                    <div class="result-badge">Analysed</div>
+                </div>
+
+                <div class="result-primary">
+                    <div class="result-label">Top Match</div>
+                    <h2 class="result-name">{{ prediction }}</h2>
+                    <div class="confidence-row">
+                        <div class="confidence-bar-track">
+                            <div class="confidence-bar-fill" style="--pct: {{ confidence }}%"></div>
+                        </div>
+                        <span class="confidence-value">{{ confidence }}%</span>
+                    </div>
+                </div>
+
+                <div class="top-list">
+                    <div class="top-list-header">
+                        <span>Species / Category</span>
+                        <span>Confidence</span>
+                    </div>
+                    {% for item in top_predictions %}
+                    <div class="top-item" style="--delay: {{ loop.index0 * 80 }}ms">
+                        <span class="top-item-name">{{ item.class_name }}</span>
+                        <div class="top-item-right">
+                            <div class="mini-bar-track">
+                                <div class="mini-bar-fill" style="--pct: {{ item.confidence }}%"></div>
+                            </div>
+                            <span class="top-item-pct">{{ item.confidence }}%</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </section>
+    </main>
+
+    <script>
+        // Drop zone interactivity
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const dropLabel = document.getElementById('dropLabel');
+
+        if (dropZone) {
+            ['dragenter', 'dragover'].forEach(e => {
+                dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.add('drag-over'); });
+            });
+            ['dragleave', 'drop'].forEach(e => {
+                dropZone.addEventListener(e, ev => { ev.preventDefault(); dropZone.classList.remove('drag-over'); });
+            });
+            dropZone.addEventListener('drop', ev => {
+                const files = ev.dataTransfer.files;
+                if (files.length) {
+                    fileInput.files = files;
+                    dropLabel.textContent = files[0].name;
+                }
+            });
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) dropLabel.innerHTML = fileInput.files[0].name;
+            });
+        }
+
+        // Animate confidence bars on load
+        window.addEventListener('load', () => {
+            const fills = document.querySelectorAll('.confidence-bar-fill, .mini-bar-fill');
+            fills.forEach((el, i) => {
+                el.style.width = '0%';
+                setTimeout(() => { el.style.width = el.style.getPropertyValue('--pct') || getComputedStyle(el).getPropertyValue('--pct'); }, 100 + i * 80);
+            });
+        });
+    </script>
+</body>
+</html>

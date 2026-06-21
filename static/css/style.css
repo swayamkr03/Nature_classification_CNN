@@ -1,0 +1,356 @@
+/* ─── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --forest:   #1a2e1a;
+    --sage:     #4a7c59;
+    --moss:     #8fbc5a;
+    --parchment:#f5f0e8;
+    --offwhite: #faf8f4;
+    --ink:      #1e2d1e;
+    --muted:    #6b7e6b;
+    --border:   #d6e4d0;
+    --shadow:   rgba(26, 46, 26, 0.10);
+    --radius:   14px;
+    --font-display: 'DM Serif Display', Georgia, serif;
+    --font-body:    'Inter', system-ui, sans-serif;
+}
+
+html { font-size: 16px; }
+
+body {
+    font-family: var(--font-body);
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* ─── Background vein motif ────────────────────────────────── */
+.bg-vein {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+}
+.bg-vein svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ─── Page layout ──────────────────────────────────────────── */
+.page {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 48px 20px 64px;
+}
+
+/* ─── Panel ─────────────────────────────────────────────────── */
+.panel {
+    width: 100%;
+    max-width: 580px;
+    background: var(--offwhite);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow:
+        0 2px 0 0 rgba(143,188,90,0.25),
+        0 20px 60px -8px var(--shadow);
+    overflow: hidden;
+}
+
+/* ─── Header ─────────────────────────────────────────────────── */
+.panel-header {
+    padding: 36px 36px 28px;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(160deg, #edf4e8 0%, var(--offwhite) 100%);
+}
+
+.header-eyebrow {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sage);
+    margin-bottom: 10px;
+}
+
+.panel-header h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 6vw, 2.75rem);
+    line-height: 1.05;
+    color: var(--forest);
+    font-weight: 400;
+    margin-bottom: 14px;
+}
+.panel-header h1 em {
+    color: var(--sage);
+    font-style: italic;
+}
+
+.header-sub {
+    font-size: 0.85rem;
+    color: var(--muted);
+    max-width: 38ch;
+    line-height: 1.6;
+}
+
+/* ─── Upload form ────────────────────────────────────────────── */
+.upload-form {
+    padding: 28px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border-bottom: 1px solid var(--border);
+}
+
+.drop-zone {
+    display: block;
+    border: 1.5px dashed var(--sage);
+    border-radius: 10px;
+    background: #f1f7ec;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+}
+.drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--moss);
+    background: #e8f3e0;
+}
+.drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+    width: 100%;
+    height: 100%;
+}
+.drop-zone-inner {
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 28px 20px;
+}
+.drop-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--sage);
+    margin-bottom: 4px;
+}
+.drop-label {
+    font-size: 0.88rem;
+    color: var(--ink);
+    font-weight: 500;
+}
+.drop-label u { text-decoration-color: var(--sage); }
+.drop-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.submit-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: var(--forest);
+    color: #e8f3e0;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 24px;
+    font-family: var(--font-body);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: background 0.2s, transform 0.1s;
+}
+.submit-btn svg {
+    width: 18px;
+    height: 18px;
+    color: var(--moss);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+.submit-btn:hover {
+    background: #243d24;
+}
+.submit-btn:hover svg { transform: translateX(3px); }
+.submit-btn:active { transform: scale(0.98); }
+
+/* ─── Result ─────────────────────────────────────────────────── */
+.result {
+    padding: 28px 36px 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Image */
+.result-image-wrap {
+    position: relative;
+    align-self: center;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px -4px var(--shadow);
+}
+.result-image-wrap img {
+    display: block;
+    max-width: 100%;
+    width: 300px;
+    height: 220px;
+    object-fit: cover;
+}
+.result-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--forest);
+    color: var(--moss);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* Primary result */
+.result-primary {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.result-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sage);
+}
+.result-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 4vw, 1.9rem);
+    font-weight: 400;
+    color: var(--forest);
+    text-transform: capitalize;
+    line-height: 1.1;
+}
+
+/* Main confidence bar */
+.confidence-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 4px;
+}
+.confidence-bar-track {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+}
+.confidence-bar-fill {
+    height: 100%;
+    width: var(--pct);
+    background: linear-gradient(90deg, var(--sage), var(--moss));
+    border-radius: 99px;
+    transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.confidence-value {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--sage);
+    min-width: 3.5ch;
+    text-align: right;
+}
+
+/* Top predictions list */
+.top-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+}
+.top-list-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 9px 14px;
+    background: #edf4e8;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+.top-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    border-top: 1px solid var(--border);
+    animation: fadeUp 0.35s ease both;
+    animation-delay: var(--delay, 0ms);
+}
+.top-item:hover { background: #f4f9f0; }
+.top-item-name {
+    font-size: 0.875rem;
+    text-transform: capitalize;
+    color: var(--ink);
+    font-weight: 500;
+}
+.top-item-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.mini-bar-track {
+    width: 72px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+}
+.mini-bar-fill {
+    height: 100%;
+    width: var(--pct);
+    background: linear-gradient(90deg, var(--sage), var(--moss));
+    border-radius: 99px;
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.top-item-pct {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--muted);
+    min-width: 3.5ch;
+    text-align: right;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 480px) {
+    .page { padding: 20px 12px 40px; }
+    .panel-header, .upload-form, .result { padding-left: 20px; padding-right: 20px; }
+    .result-image-wrap img { width: 100%; height: 200px; }
+    .mini-bar-track { width: 48px; }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+    .result, .top-item { animation: none; }
+    .confidence-bar-fill, .mini-bar-fill { transition: none; }
+}

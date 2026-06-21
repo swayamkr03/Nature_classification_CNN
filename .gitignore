@@ -1,0 +1,9 @@
+__pycache__/
+.ipynb_checkpoints/
+static/uploads/
+*.pyc
+.env
+cifar_100/
+notebooks/cifar_100/
+notebooks/cifar_100/
+cifar_100/
